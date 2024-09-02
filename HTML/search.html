@@ -1,0 +1,32 @@
+<!-- videos/templates/search.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Subtitles</title>
+    <script>
+        async function searchSubtitles(event) {
+            event.preventDefault();
+            const query = document.getElementById('query').value;
+            const response = await fetch(`http://127.0.0.1:8000/api/videos/search/?query=${query}`);
+            const data = await response.json();
+            const results = document.getElementById('results');
+            results.innerHTML = '';
+            data.forEach(subtitle => {
+                results.innerHTML += `<p>${subtitle.text} (${subtitle.start_time} - ${subtitle.end_time})</p>`;
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Search Subtitles</h1>
+    <form onsubmit="searchSubtitles(event)">
+        <label for="query">Search keyword:</label>
+        <input type="text" id="query" name="query" required>
+        <button type="submit">Search</button>
+    </form>
+    <div id="results"></div>
+</body>
+</html>

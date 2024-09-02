@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload and Play Video</title>
+    <script defer>
+        async function uploadVideo(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const response = await fetch('http://127.0.0.1:8000/api/videos/upload/', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (response.ok) {
+                await getVideos();  // Refresh video list after upload
+                alert('Video uploaded successfully!');
+            } else {
+                alert('Upload failed!');
+            }
+        }
+
+        async function getVideos() {
+            const response = await fetch('http://127.0.0.1:8000/api/videos/upload/');
+            const videos = await response.json();
+
+            const videoList = document.getElementById('videoList');
+            videoList.innerHTML = '';  // Clear previous list
+
+            videos.forEach(video => {
+                const listItem = document.createElement('li');
+                listItem.textContent = video.title;
+                listItem.onclick = () => playVideo(video.video_url);
+                videoList.appendChild(listItem);
+            });
+        }
+
+        function playVideo(videoUrl) {
+            const videoElement = document.getElementById('videoPlayer');
+            videoElement.src = videoUrl;
+            videoElement.style.display = 'block';
+        }
+
+        window.onload = getVideos;  // Fetch videos on page load
+    </script>
+</head>
+<body>
+    <h1>Upload and Play Video</h1>
+    <form onsubmit="uploadVideo(event)">
+        <label for="video_file">Choose a video file:</label>
+        <input type="file" id="video_file" name="video_file" required>
+        <button type="submit">Upload</button>
+    </form>
+
+    <h2>Available Videos</h2>
+    <ul id="videoList"></ul>  <!-- Video list will be populated here -->
+
+    <h2>Video Player</h2>
+    <video id="videoPlayer" width="600" controls style="display: none;">
+        Your browser does not support the video tag.
+    </video>
+</body>
+</html>
